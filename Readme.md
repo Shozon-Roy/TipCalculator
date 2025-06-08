@@ -4,7 +4,7 @@ A beautifully designed, modern tip calculator web app. Instantly calculate tips,
 
 ## 📷 Image Preview
 
-![Tip Calculator Screenshot](preview.jpg)
+![Tip Calculator Screenshot](20250608_224456.jpg)
 
 ---
 
