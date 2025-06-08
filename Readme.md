@@ -43,7 +43,7 @@ A beautifully designed, modern tip calculator web app. Instantly calculate tips,
 
 ## 🚀 Live Demo
 
-[Open Live Demo](#) 
+[Open Live Demo](https://roytipcalculator.vercel.app/) 
 
 
 ## 👤 Author
