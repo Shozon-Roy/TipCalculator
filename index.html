@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0">
+  <title>Tip Calculator - Improved Clone 2</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,500,700,900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-bg: #161e2d;
+      --card-bg: #1a2235;
+      --primary: #4b3ff5;
+      --primary-gradient: linear-gradient(90deg, #4b3ff5 0%, #3f7af5 100%);
+      --secondary: #e748b3;
+      --input-bg: #161e2d;
+      --input-border: #292f44;
+      --input-color: #888b97;
+      --text-main: #fff;
+      --text-muted: #cfcfd4;
+      --shadow: 0 6px 32px 0 rgba(18,23,39,0.48);
+      --shadow-glow: 0 0 0 4px #4b3ff577;
+      --radius-lg: 32px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --font-main: 'Inter', sans-serif;
+      --section-spacing: 2.5rem;
+      --navbar-bg: #181c2b;
+      --logo-gradient: linear-gradient(90deg, #4b3ff5 0%, #e748b3 100%);
+      --icon-glow: 0 0 16px #4b3ff599;
+    }
+    [data-theme="light"] {
+      --main-bg: #f6f7fb;
+      --card-bg: #fff;
+      --primary: #4b3ff5;
+      --primary-gradient: linear-gradient(90deg, #4b3ff5 0%, #e748b3 100%);
+      --secondary: #e748b3;
+      --input-bg: #f0f2f8;
+      --input-border: #d1d5da;
+      --input-color: #888b97;
+      --text-main: #1a2235;
+      --text-muted: #61677c;
+      --shadow: 0 6px 32px 0 rgba(40,60,85,0.10);
+      --shadow-glow: 0 0 0 4px #4b3ff522;
+      --navbar-bg: #fff;
+      --logo-gradient: linear-gradient(90deg, #4b3ff5 0%, #e748b3 100%);
+      --icon-glow: 0 0 16px #e748b344;
+    }
+    html, body {
+      font-family: var(--font-main);
+      background: var(--main-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+    /* --- Navbar --- */
+    .navbar-custom {
+      background: var(--navbar-bg);
+      box-shadow: var(--shadow);
+      height: 4.1rem;
+      padding: 0 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-radius: 0 0 22px 22px;
+      margin-bottom: 1.1rem;
+      transition: background 0.4s;
+    }
+    .navbar-logo {
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: -.01em;
+      background: var(--logo-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      user-select: none;
+    }
+    .navbar-logo i {
+      font-size: 1.7rem;
+      margin-right: 0.2rem;
+      filter: drop-shadow(var(--icon-glow));
+    }
+    .theme-toggle-btn {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 1.7rem;
+      color: var(--primary);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+      box-shadow: none;
+      position: relative;
+    }
+    .theme-toggle-btn:focus {
+      box-shadow: var(--shadow-glow);
+    }
+    .theme-toggle-btn .bi {
+      filter: drop-shadow(var(--icon-glow));
+      transition: color 0.2s, text-shadow 0.2s;
+    }
+    .theme-toggle-btn.active {
+      background: var(--primary-gradient);
+      color: #fff;
+      box-shadow: 0 2px 10px #4b3ff522;
+    }
+    .bg-circles {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      top: 0; left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .circle1, .circle2 {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.15;
+      background: #4b3ff5;
+      filter: blur(1.2px);
+    }
+    .circle1 {
+      width: 380px; height: 380px;
+      left: -120px; top: -60px;
+    }
+    .circle2 {
+      width: 240px; height: 240px;
+      right: -70px; top: 80px;
+      background: #e748b3;
+    }
+    [data-theme="light"] .bg-circles .circle1 {
+      background: #e748b3;
+    }
+    [data-theme="light"] .bg-circles .circle2 {
+      background: #4b3ff5;
+    }
+    .container-custom {
+      max-width: 420px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      position: relative;
+      z-index: 2;
+      /* Added for mobile centering */
+      width: 100%;
+      min-width: 0;
+    }
+    .tip-title {
+      font-weight: 900;
+      font-size: 2.6rem;
+      letter-spacing: -.04em;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 0.5rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      user-select: none;
+    }
+    .tip-badge {
+      position: absolute;
+      left: 358px;
+      top: 5px;
+      background: var(--secondary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.24rem 1.2rem 0.18rem 1.2rem;
+      border-radius: 30px 30px 30px 10px;
+      box-shadow: 0 3px 14px 0 rgba(231, 72, 179, 0.24);
+      transform: rotate(14deg);
+      z-index: 2;
+      user-select: none;
+    }
+    .tip-desc {
+      color: var(--text-muted);
+      font-size: 1.24rem;
+      margin-bottom: var(--section-spacing);
+      text-align: center;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 0 0.5rem;
+      text-shadow: 0 2px 8px #0001;
+    }
+    .card-tip {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 2.25rem 1.5rem 1.5rem 1.5rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      border: none;
+      transition: background 0.3s;
+      border: 1.5px solid var(--input-border);
+      overflow: hidden;
+      /* subtle glass effect */
+      backdrop-filter: blur(1.5px);
+      /* Centering for mobile */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .card-tip::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 6px;
+      background: var(--primary-gradient);
+      border-radius: 0 0 22px 22px;
+      opacity: 0.19;
+    }
+    .tip-section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1.2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      text-shadow: 0 2px 8px #0001;
+    }
+    .tip-section-title:after {
+      content: '';
+      display: block;
+      width: 2.2rem;
+      height: 0.2rem;
+      border-radius: 6px;
+      background: var(--primary);
+      margin-left: 0.6rem;
+    }
+    .tip-label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.7rem;
+      color: var(--text-main);
+      letter-spacing: 0.01em;
+      text-shadow: 0 2px 8px #0001;
+    }
+    .input-group-tip {
+      background: var(--input-bg) !important;
+      border: 2px solid var(--input-border) !important;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.45rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 1px 8px #4b3ff512;
+      transition: border 0.17s;
+    }
+    .input-group-tip input {
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      color: var(--text-main) !important;
+      font-size: 1.2rem;
+      width: 100%;
+      padding: 0.5rem 0.5rem 0.5rem 1rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: color 0.2s, background 0.2s;
+      box-shadow: none !important;
+      /* Remove autofill background */
+      -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+      box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+      caret-color: var(--primary);
+    }
+    .input-group-tip input:focus {
+      background: transparent !important;
+      color: var(--primary) !important;
+    }
+    .input-group-tip .input-group-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--input-color) !important;
+      font-size: 1.3rem;
+      padding-left: 1.1rem;
+      font-weight: 700;
+      min-width: 2.2rem;
+      transition: color 0.2s;
+    }
+    .input-group-tip:focus-within {
+      border: 2.5px solid var(--primary) !important;
+      box-shadow: var(--shadow-glow);
+    }
+    .tip-percentage-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+    .btn-tip {
+      flex: 1;
+      border-radius: var(--radius-md);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+      border: 2px solid var(--input-border);
+      height: 58px;
+      transition: all 0.13s;
+      box-shadow: none;
+      outline: none;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .btn-tip.active,
+    .btn-tip:focus,
+    .btn-tip.selected {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: 2px solid #3f7af5;
+      box-shadow: 0 2px 10px 0 #4b3ff522;
+    }
+    .btn-tip.active::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 18px 2px #4b3ff533;
+      z-index: -1;
+      opacity: 0.13;
+      pointer-events: none;
+    }
+    .btn-tip.disabled, .btn-tip[disabled] {
+      background: var(--input-bg);
+      color: #888b97;
+      border: 2px solid var(--input-border);
+      opacity: 1;
+      pointer-events: none;
+      filter: grayscale(0.25);
+      font-weight: 600;
+    }
+    .btn-tip.custom {
+      color: #888b97;
+      font-weight: 600;
+      font-size: 1.1rem;
+      background: var(--input-bg);
+      border: 2px solid var(--input-border);
+      position: relative;
+    }
+    .btn-tip.custom.active,
+    .btn-tip.custom.selected {
+      background: var(--primary-gradient);
+      color: #fff;
+      border: 2px solid #3f7af5;
+    }
+    .custom-tip-input-wrap {
+      margin-top: 0.7rem;
+      margin-bottom: 1.1rem;
+      animation: fadeIn .22s;
+      width: 100%;
+      max-width: 252px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .custom-tip-input .input-group-tip {
+      margin-bottom: 0;
+      height: 52px;
+    }
+    .btn-calculate {
+      width: 100%;
+      height: 60px;
+      border-radius: var(--radius-md);
+      background: var(--primary-gradient);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.3rem;
+      border: none;
+      margin-top: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      box-shadow: 0 5px 24px 0 #4b3ff533;
+      transition: background 0.18s, box-shadow 0.18s;
+      letter-spacing: 0.01em;
+      position: relative;
+    }
+    .btn-calculate:active {
+      filter: brightness(0.93);
+      box-shadow: 0 2px 10px #4b3ff533;
+    }
+    .btn-calculate .bi {
+      font-size: 1.3em;
+      filter: drop-shadow(var(--icon-glow));
+    }
+    #tip-result {
+      background: var(--input-bg);
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--input-border);
+      box-shadow: 0 1px 8px #4b3ff512;
+      padding: 1.15rem 1rem 0.5rem 1rem;
+      transition: background 0.2s;
+      margin-top: 1.7rem;
+      text-align: center;
+    }
+    #tip-result .fw-bold {
+      color: var(--primary);
+      text-shadow: 0 1px 2px #4b3ff522;
+    }
+    #tip-result hr {
+      margin-bottom: 0.7rem;
+      margin-top: 0;
+      border-color: var(--input-border);
+      opacity: 0.5;
+    }
+    /* Responsive */
+    @media (max-width: 576px) {
+      .container-custom {
+        padding-top: 1.1rem;
+        max-width: 99vw;
+        min-width: 0;
+      }
+      .card-tip {
+        padding: 1.5rem 0.5rem 1.1rem 0.5rem;
+        margin-left: 8px;
+        margin-right: 8px;
+        width: calc(100vw - 16px);
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .tip-title {
+        font-size: 2.1rem;
+      }
+      .tip-section-title {
+        font-size: 1.3rem;
+      }
+      .tip-desc {
+        font-size: 1.1rem;
+      }
+      .custom-tip-input-wrap {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+    /* Remove background from autofill in Chrome/Safari */
+    input:-webkit-autofill,
+    input:-webkit-autofill:active,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:hover {
+      -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+      box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+      -webkit-text-fill-color: var(--text-main) !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar-custom">
+    <span class="navbar-logo">
+      <i class="bi bi-cash-stack"></i>
+      TipCalc
+    </span>
+    <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+      <i class="bi bi-moon-stars-fill" id="theme-icon"></i>
+    </button>
+  </nav>
+  <div class="bg-circles">
+    <div class="circle1"></div>
+    <div class="circle2"></div>
+  </div>
+  <div class="container-custom">
+    <!-- Header Section -->
+    <div class="position-relative mb-1">
+      <div class="tip-title">
+        Tip Calculator
+        <span class="tip-badge">New</span>
+      </div>
+    </div>
+    <div class="tip-desc">
+      Calculate tips quickly and split bills with friends with just a few clicks. Save your favorite presets for quick access.
+    </div>
+    <!-- Card Section -->
+    <div class="card-tip">
+      <div class="tip-section-title mb-3">
+        Calculate Your Tip
+      </div>
+      <!-- Bill Amount -->
+      <div class="tip-label">Bill Amount</div>
+      <div class="input-group input-group-tip mb-4">
+        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+        <input type="number" min="0" step="0.01" class="form-control shadow-none" id="bill-amount" placeholder="Enter bill amount" autocomplete="off">
+      </div>
+      <!-- Tip Percentage -->
+      <div class="tip-label">Tip Percentage</div>
+      <div class="tip-percentage-row mb-2">
+        <button class="btn btn-tip" data-tip="15">15%</button>
+        <button class="btn btn-tip" data-tip="18">18%</button>
+      </div>
+      <div class="tip-percentage-row mb-2">
+        <button class="btn btn-tip" data-tip="20">20%</button>
+        <button class="btn btn-tip" data-tip="22">22%</button>
+      </div>
+      <div class="tip-percentage-row mb-3">
+        <button class="btn btn-tip" data-tip="25">25%</button>
+        <button class="btn btn-tip custom" id="custom-tip-btn">Custom</button>
+      </div>
+      <div class="custom-tip-input-wrap" id="custom-tip-input-wrap" style="display:none;">
+        <div class="custom-tip-input" style="width:100%;">
+          <div class="input-group input-group-tip">
+            <span class="input-group-text"><i class="bi bi-percent"></i></span>
+            <input type="number" min="1" max="99" class="form-control shadow-none" id="custom-tip-input" placeholder="Custom tip %" autocomplete="off">
+          </div>
+        </div>
+      </div>
+      <!-- Number of People -->
+      <div class="tip-label mt-3">Number of People</div>
+      <div class="input-group input-group-tip mb-4">
+        <span class="input-group-text"><i class="bi bi-people-fill"></i></span>
+        <input type="number" min="1" max="100" class="form-control shadow-none" id="num-people" value="1" autocomplete="off">
+      </div>
+      <!-- Calculate Button -->
+      <button class="btn btn-calculate" id="calculate-btn">
+        <i class="bi bi-calculator-fill"></i>
+        Calculate Tip
+      </button>
+      <!-- Result -->
+      <div id="tip-result" class="mt-4" style="display:none;">
+        <hr>
+        <div class="fw-bold fs-5 mb-1">Tip Amount: <span id="tip-amount" class="fw-bold"></span></div>
+        <div class="fw-bold fs-6 mb-1">Total per Person: <span id="total-per-person"></span></div>
+      </div>
+    </div>
+  </div>
+  <!-- JQuery + Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Calculator & Theme JS -->
+  <script>
+    $(function(){
+      // Theme (dark/light mode)
+      const themeBtn = $('#theme-toggle-btn');
+      const themeIcon = $('#theme-icon');
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if(theme === 'light') {
+          themeBtn.addClass('active');
+          themeIcon.removeClass('bi-moon-stars-fill').addClass('bi-sun-fill');
+        } else {
+          themeBtn.removeClass('active');
+          themeIcon.removeClass('bi-sun-fill').addClass('bi-moon-stars-fill');
+        }
+        localStorage.setItem('tipcalc-theme', theme);
+      }
+      // Load theme from storage or system
+      const userTheme = localStorage.getItem('tipcalc-theme');
+      if(userTheme) {
+        setTheme(userTheme);
+      } else if(window.matchMedia('(prefers-color-scheme: light)').matches) {
+        setTheme('light');
+      }
+      themeBtn.on('click', function(){
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        setTheme(current === 'dark' ? 'light' : 'dark');
+      });
+
+      // Inter font weight fix
+      document.body.style.fontFamily = "'Inter', sans-serif";
+
+      // Tip buttons
+      let selectedTip = 18; // default selected
+      let isCustom = false;
+      let customTipValue = null;
+
+      function selectTip(tip, custom) {
+        $('.btn-tip').removeClass('active');
+        if(custom) {
+          $('#custom-tip-btn').addClass('active');
+          $('#custom-tip-input-wrap').slideDown(150);
+          isCustom = true;
+        } else {
+          $('.btn-tip[data-tip="' + tip + '"]').addClass('active');
+          $('#custom-tip-input-wrap').slideUp(120);
+          $('#custom-tip-input').val('');
+          isCustom = false;
+        }
+        selectedTip = tip;
+      }
+      // Default select
+      selectTip(18, false);
+
+      $('.btn-tip:not(.custom)').on('click', function() {
+        selectTip(parseFloat($(this).data('tip')), false);
+      });
+
+      $('#custom-tip-btn').on('click', function() {
+        selectTip(null, true);
+        setTimeout(function(){
+          $('#custom-tip-input').focus();
+        }, 170);
+      });
+
+      $('#custom-tip-input').on('input', function() {
+        let val = parseFloat($(this).val());
+        if(!isNaN(val) && val > 0 && val < 100) {
+          customTipValue = val;
+        } else {
+          customTipValue = null;
+        }
+      });
+
+      $('#calculate-btn').on('click', function() {
+        let bill = parseFloat($('#bill-amount').val());
+        let people = parseInt($('#num-people').val());
+        let tipPercent = isCustom ? parseFloat($('#custom-tip-input').val()) : selectedTip;
+        if(isNaN(bill) || bill <= 0) {
+          $('#bill-amount').focus();
+          showResult(false);
+          return;
+        }
+        if(isNaN(people) || people <= 0) {
+          $('#num-people').focus();
+          showResult(false);
+          return;
+        }
+        if(isCustom) {
+          if(isNaN(tipPercent) || tipPercent <= 0 || tipPercent >= 100) {
+            $('#custom-tip-input').focus();
+            showResult(false);
+            return;
+          }
+        }
+        let tip = bill * (tipPercent / 100);
+        let total = bill + tip;
+        let totalPerPerson = total / people;
+        $('#tip-amount').text('$' + tip.toFixed(2));
+        $('#total-per-person').text('$' + totalPerPerson.toFixed(2));
+        showResult(true);
+      });
+
+      function showResult(show) {
+        if(show) {
+          $('#tip-result').fadeIn(230);
+        } else {
+          $('#tip-result').fadeOut(120);
+        }
+      }
+
+      // Make sure when custom tip input loses focus, it doesn't submit on enter
+      $('#custom-tip-input').on('keydown', function(e){
+        if(e.key === 'Enter') {
+          e.preventDefault();
+          $('#calculate-btn').trigger('click');
+        }
+      });
+
+      // Keyboard accessibility: select tip with keyboard
+      $('.btn-tip').on('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' ') {
+          $(this).click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
